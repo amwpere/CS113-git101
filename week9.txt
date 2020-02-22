@@ -1,0 +1,146 @@
+พื้นฐานการใช้งาน Git (Branch Merge Conflict)
+เข้า working directory โดยคำสั่ง
+cd โฟลเดอร์ที่เราสร้าง เช่น 
+cd git101
+
+การสร้าง Branch
+ใช้คำสั่ง git branch <branch-name>
+เช่น git branch feature
+branch หลักของ repository คือ master
+การสร้าง branch จะแยกออกจาก branch เดิมเพื่อแยกส่วนการพัฒนางานออกจากกัน
+การตรวจสอบ branch ใช้คำสั่ง git branch
+จะแสดงข้อมูลที่มีเครื่องหมาย * อยู่นำหน้าชื่อ branch ที่กำลังพัฒนาอยู่ใน ปัจจุบัน
+เพราะยังไม่มีการย้ายไปไหน นั่นก็คือ master
+การเปลี่ยน branch ใช้คำสั่ง git checkout feature
+และทำการตรวจสอบ branch อีกครั้งว่าเปลี่ยนมาเป็น *feature หรือยัง โดย git branch
+
+การ Merge Branch แบบ ไม่มี Conflict
+จะทำการเพิ่ม ไฟล์ .txt ใน branch ไหน สามารถทำได้โดยขั้นตอนนี้
+git checkout <branch ที่ต้องการ>
+git add ไฟล์.txt 
+git commit -m "หัวข้อของไฟล์.txt นั้น"
+
+ใช้คำสั่ง git log --all --decorate --oneline --graph
+เพื่อตรวจดู checkpoint ทั้งหมด
+
+push ข้อมูล ใน branch นั้น ได้โดย
+git checkout master
+git log --all --decorate --oneline --graph
+git push origin master
+git log --all --decorate --oneline --graph
+
+การรวมงานของ branch สามารถทำได้โดยขั้นตอนนี้
+เปลี่ยนไปที่ branch ปลายทาง
+เช่น git checkout master
+git merge feature รวม branch feature ให้อยู่ใน master
+
+เมื่อ merge แล้วก็จะเห็นว่ามีทั้ง 2 ไฟล์ อยู่ใน branch master
+และหากอยากจะ push master ขึ้น github จะสามารถทำได้โดย
+git push origin master
+จะถือว่าการ merge นั้น สมบูรณ์
+
+การ Pull แบบไม่มี Conflict
+ทำการ clone git repository มาไว้ใน directory ใหม่
+cd ..
+git clone <git url> โฟลเดอร์ใหม่ เช่น git102
+cd git102
+
+เพิ่ม ไฟล์.txt ใน directory ใหม่
+git add ไฟล์.txt
+git commit -m "หัวข้อของไฟล์.txt"
+ืทำการ push ไปที่ github
+git push origin master
+
+กลับมาที่ directory เดิม แล้ว pull การเปลี่ยนแปลงลงมาที่ local repository
+cd .. 
+cd git101
+ls -1   #จะเห็นว่าไม่มีไฟล์ .txt
+git pull origin master  #ดึงการเปลี่ยนแปลงจาก branch master
+ls -1   #มีไฟล์.txt
+
+การ Merge แบบมี Conflict(ความขัดแย้ง)
+เกิดจากการปรับแก้ไขข้อมูลไฟล์เดิม บรรทัดเดิม ที่อยู่ต่าง branch กัน เมื่อ merge แล้ว
+git ตัดสินใจไม่ได้ว่าจะใช้ข้อมูล branch ไหน
+
+สร้าง branch feature2
+git branch feature2
+แล้วสลับไป branch นั้น
+git checkout -b feature2
+
+ให้แก้ไขไฟล์ b.txt ใน branch feature2  และ master ในบรรทัดเดียวกัน
+ให้เกิดความแตกต่างกัน
+git checkout feature2
+ทำการแก้ไขไฟล์ b.txt บรรทัดแรกให้เห็นความแตกต่าง
+git status  #เช็คดูความเปลี่ยนแปลง
+git add b.txt
+git commit -m "หัวข้อของไฟล์"
+git log --all --decorate --oneline --graph
+
+git checkout master
+ทำการแก้ไขไฟล์ b.txt บรรทัดแรกให้เห็นความแตกต่าง
+git status  #เช็คดูความเปลี่ยนแปลง
+git add b.txt
+git commit -m "หัวข้อของไฟล์"
+git log --all --decorate --oneline --graph
+
+ทำการ merge feature2 และ master เข้าด้วยกัน (ไม่ต้อง push ก็ merge ได้)
+git checkout master
+git merge feature2
+จะเกิดข้อความว่า Conflict ขึ้น
+
+เปิดไฟล์ b.txt ใน master จะเห็น git สร้างข้อความอธิบาย Conflict
+- Editor มี tool ที่ช่วยจัดการ Conflict
+- Editor ไม่มี tool ช่วย
+
+เมิ่อ แก้ไข Conflict แล้วให้ commit การ merge นั้น
+git add b.txt
+git status
+git commit -m "หัวข้อของไฟล์"
+git log --all --decorate --oneline --graph
+git push origin master
+git log --all --decorate --oneline --graph
+
+การ pull แบบมี Conflict
+ใน directory ใหม่ ให้แก้ไขไฟล์ .txt
+cd .. 
+cd git102
+git pull origin master
+แก้ไขไฟล์ .txt ใน git102
+git status
+git add ไฟล์.txt
+git status
+git commit -m "หัวข้อของไฟล์"
+git log --all --decorate -- oneline --graph
+git push origin master
+git log --all --decorate -- oneline --graph
+
+แก้ไข ไฟล์.txt เดียวกันใน directory git101
+cd ..
+cd git101
+แก้ไขบรรทัดเดียวกันกับข้างบน
+git status
+git add ไฟล์.txt
+git status
+git commit -m "หัวข้อของไฟล์"
+git log --all --decorate --oneline --graph
+
+ก่อน push ให้ pull origin/master จะมี Conflict เกิดขึ้น
+ให้แก้ไข Conflict ในไฟล์.txt
+git pull origin master
+git status
+แก้ไข Conflict
+git add ไฟล์.txt
+git status
+git commit -m "หัวข้อของไฟล์"
+git log --all --decorate --oneline --graph
+git push origin master
+git log --all --decorate -- oneline --graph
+
+ใน directory ใหม่ จะเห็น checkpoint ตามหลัง origin/masterอยู่
+cd ..
+cd git102
+git log --all --decorate -- oneline --graph
+ให้ pull ลงมา
+git pull origin master
+git log --all --decorate -- oneline --graph
+สังเกตว่าจะไม่เห็น Conflict เพราะไม่มีการแก้ไขเพิ่มเติม
